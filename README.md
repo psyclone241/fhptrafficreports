@@ -8,7 +8,7 @@
 ### How do I get set up? ###
 
 * Install BeautifulSoup python module
-** `sudo pip install -U BeautifulSoup`
+  `sudo pip install -U BeautifulSoup`
 * Edit the CONFIG constant to fit your settings, though they shouldn't need to be changed
 * BeautifulSoup, json, re, argparse
 * How to run tests (None Implemented Yet)
