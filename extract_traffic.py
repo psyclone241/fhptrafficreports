@@ -18,9 +18,9 @@ def main(config):
             description=config['description'],
             epilog=''
         )
-    parser.add_argument('-d', action='store', dest='data', help='Data Value: Troop Letter or County Name')
-    parser.add_argument('-t', action='store', dest='type', choices=['county', 'troop'], help='Type of Search, choose "county" or "troop"')
-    parser.add_argument('-o', action='store', dest='output', choices=['print', 'json'], help='Output data to the terminal with print or json (json will not include notes)')
+    parser.add_argument('-d', action='store', dest='data', help='Data Value: Troop Letter or County Name', default='A')
+    parser.add_argument('-t', action='store', dest='type', choices=['county', 'troop'], help='Type of Search, choose "county" or "troop"', default='troop')
+    parser.add_argument('-o', action='store', dest='output', choices=['print', 'json'], help='Output data to the terminal with print or json (json will not include notes)', default='json')
     args = parser.parse_args()
 
     vars(args)
