@@ -27,6 +27,15 @@ def main(config):
 
     if args.data or args.type:
         data = getCountiesAndTroops(config['county_troop_data_url'], config['data_section_id'], config['traffic_data_url'])
+
+        if data:
+            if not data['troops'] or not data['counties']:
+                print 'No county/troop data was loaded, exiting'
+                quit()
+        else:
+            print 'Data table failed to load, exiting'
+            quit()
+
         if args.type:
             if args.data:
                 search_value = args.data.upper()
@@ -35,7 +44,7 @@ def main(config):
                     if search_value in data['counties']:
                         outputToTerminal('Located data, retrieving...', args.output)
                         incidents = getIncidents(data['counties'][search_value]['url'], config['traffic_data_url'], config['header_table_class'], config['incidents_table_id'], config['logo_alt_tag_attribute'])
-                        outputData({ 'source': { 'url': config['county_troop_data_url'], 'type': args.type, 'county': data['counties'][search_value] }, 'data': incidents }, args.output)
+                        outputData({ 'source': { 'url': config['county_troop_data_url'], 'type': args.type, 'county': data['counties'][search_value] }, 'data': incidents }, args.output, config['output_file'])
                     else:
                         print 'No county by that name'
                 else:
@@ -43,7 +52,7 @@ def main(config):
                     if search_value in data['troops']:
                         outputToTerminal('Located data, retrieving...', args.output)
                         incidents = getIncidents(data['troops'][search_value]['url'], config['traffic_data_url'], config['header_table_class'], config['incidents_table_id'], config['logo_alt_tag_attribute'])
-                        outputData({ 'source': { 'url': config['county_troop_data_url'], 'type': args.type,  'troop': data['troops'][search_value] }, 'data': incidents }, args.output)
+                        outputData({ 'source': { 'url': config['county_troop_data_url'], 'type': args.type,  'troop': data['troops'][search_value] }, 'data': incidents }, args.output, config['output_file'])
                     else:
                         outputToTerminal('No troop by that letter', args.output)
             else:
@@ -57,12 +66,17 @@ def outputToTerminal(data, output_format):
     if output_format == 'print':
         print data
 
-def outputData(data, output_format):
+def outputData(data, output_format, file_name=None):
     if output_format == 'print':
         outputToTerminal(data, output_format)
     elif output_format == 'json':
-        json_data = json.dumps(data)
-        print(json_data)
+        json_data = json.dumps(data, indent=4, sort_keys=True)
+
+        if file_name:
+            with open(file_name, 'w') as outfile:
+                outfile.write(json_data)
+        else:
+            print(json_data)
     else:
         print 'Invalid output format defined'
 
@@ -188,13 +202,14 @@ def getIncidents(url, base_url, header_table_class, incidents_table_id, logo_alt
     return incidents
 
 CONFIG = {
-    'traffic_data_url': 'http://www.flhsmv.gov/fhp/traffic/',
-    'county_troop_data_url': 'http://www.flhsmv.gov/florida-highway-patrol/traffic-incidents-by-region/',
+    'traffic_data_url': 'https://www.flhsmv.gov/fhp/traffic/',
+    'county_troop_data_url': 'https://www.flhsmv.gov/florida-highway-patrol/traffic-incidents-by-region/',
     'description': 'Get Traffice Reports from Florida Highway Patrol',
     'logo_alt_tag_attribute': 'Florida Highway Patrol Logo',
     'data_section_id': 'text',
     'header_table_class': 'HeaderTitle',
-    'incidents_table_id': 'IncidentTable'
+    'incidents_table_id': 'IncidentTable',
+    'output_file': 'incident_data.json',
 }
 
 # Run the program from here
